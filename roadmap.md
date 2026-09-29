@@ -1,12 +1,8 @@
 # Consulta de Itinerários — roadmap
 
-- [x] Banco de dados
-- [x] Busca normalizada por bairro, rua, ponto e linha
-- [x] Importar o KMZ enviado (70 linhas / 1.392 pontos únicos)
-- [x] Tela inicial com busca e resultado por localidade
-- [x] Página da linha com mapa, pontos na ordem e compartilhar
-- [x] Página do ponto
-- [x] Todas as linhas com filtro
-- [x] PWA (manifest, ícone)
-- [x] Área administrativa com login (linhas, pontos, importar novo KMZ, histórico)
-- [x] Página do bairro (/bairro/slug)
+- [x] Versão anterior (busca, páginas públicas, PWA, admin antigo)
+- [x] Novo esquema: arquivos, rotas, paradas (cascata, posições original/editada, suspeito, índices, escrita só admin)
+- [x] Importação com normalizeCoord e resumo (linhas, pontos, invertidos, suspeitos); Placemark Point+Polygon usa só o Point
+- [ ] Telas de edição (aguardando aprovação)
+- [ ] Histórico de alterações (adiado a pedido)
+- [ ] Páginas públicas lendo o novo esquema (fora desta etapa)
