@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      arquivos: {
+        Row: {
+          id: string
+          importado_em: string
+          importado_por: string | null
+          nome: string
+          total_invertidos: number
+          total_linhas: number
+          total_pontos: number
+          total_suspeitos: number
+        }
+        Insert: {
+          id?: string
+          importado_em?: string
+          importado_por?: string | null
+          nome: string
+          total_invertidos?: number
+          total_linhas?: number
+          total_pontos?: number
+          total_suspeitos?: number
+        }
+        Update: {
+          id?: string
+          importado_em?: string
+          importado_por?: string | null
+          nome?: string
+          total_invertidos?: number
+          total_linhas?: number
+          total_pontos?: number
+          total_suspeitos?: number
+        }
+        Relationships: []
+      }
       auditoria: {
         Row: {
           created_at: string
@@ -321,6 +354,84 @@ export type Database = {
           },
         ]
       }
+      paradas: {
+        Row: {
+          arquivo_id: string
+          bairro: string | null
+          created_at: string
+          descricao_original: string | null
+          id: string
+          invertido: boolean
+          kml_id: string | null
+          lat_editada: number | null
+          lat_original: number
+          lon_editada: number | null
+          lon_original: number
+          nome: string | null
+          ordem: number
+          rota_id: string
+          rua: string | null
+          suspeito: boolean
+          tipo: string | null
+          updated_at: string
+        }
+        Insert: {
+          arquivo_id: string
+          bairro?: string | null
+          created_at?: string
+          descricao_original?: string | null
+          id?: string
+          invertido?: boolean
+          kml_id?: string | null
+          lat_editada?: number | null
+          lat_original: number
+          lon_editada?: number | null
+          lon_original: number
+          nome?: string | null
+          ordem: number
+          rota_id: string
+          rua?: string | null
+          suspeito?: boolean
+          tipo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          arquivo_id?: string
+          bairro?: string | null
+          created_at?: string
+          descricao_original?: string | null
+          id?: string
+          invertido?: boolean
+          kml_id?: string | null
+          lat_editada?: number | null
+          lat_original?: number
+          lon_editada?: number | null
+          lon_original?: number
+          nome?: string | null
+          ordem?: number
+          rota_id?: string
+          rua?: string | null
+          suspeito?: boolean
+          tipo?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paradas_arquivo_id_fkey"
+            columns: ["arquivo_id"]
+            isOneToOne: false
+            referencedRelation: "arquivos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paradas_rota_id_fkey"
+            columns: ["rota_id"]
+            isOneToOne: false
+            referencedRelation: "rotas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pontos: {
         Row: {
           ativo: boolean
@@ -388,6 +499,65 @@ export type Database = {
             columns: ["import_batch_id"]
             isOneToOne: false
             referencedRelation: "importacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rotas: {
+        Row: {
+          arquivo_id: string
+          ativo: boolean
+          codigo: string
+          created_at: string
+          descricao_original: string | null
+          destino: string | null
+          id: string
+          kml_id: string | null
+          nome: string | null
+          origem: string | null
+          sentido: string
+          trajeto_editado: Json | null
+          trajeto_original: Json
+          updated_at: string
+        }
+        Insert: {
+          arquivo_id: string
+          ativo?: boolean
+          codigo: string
+          created_at?: string
+          descricao_original?: string | null
+          destino?: string | null
+          id?: string
+          kml_id?: string | null
+          nome?: string | null
+          origem?: string | null
+          sentido?: string
+          trajeto_editado?: Json | null
+          trajeto_original?: Json
+          updated_at?: string
+        }
+        Update: {
+          arquivo_id?: string
+          ativo?: boolean
+          codigo?: string
+          created_at?: string
+          descricao_original?: string | null
+          destino?: string | null
+          id?: string
+          kml_id?: string | null
+          nome?: string | null
+          origem?: string | null
+          sentido?: string
+          trajeto_editado?: Json | null
+          trajeto_original?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rotas_arquivo_id_fkey"
+            columns: ["arquivo_id"]
+            isOneToOne: false
+            referencedRelation: "arquivos"
             referencedColumns: ["id"]
           },
         ]
