@@ -111,9 +111,18 @@ function Admin() {
             <div key={a.id} className="superficie p-3 text-sm">
               <div className="flex justify-between gap-2">
                 <strong className="truncate">{a.nome}</strong>
-                <span className="text-muted-foreground">{new Date(a.importado_em).toLocaleString("pt-BR")}</span>
+                <span className="shrink-0 text-muted-foreground">{new Date(a.importado_em).toLocaleString("pt-BR")}</span>
               </div>
               <p>{a.total_linhas} linhas · {a.total_pontos} pontos · {a.total_invertidos} invertidos · {a.total_suspeitos} suspeitos</p>
+              <div className="mt-2 flex gap-4">
+                <Link to="/editar/arquivo/$id" params={{ id: a.id }} className="font-semibold text-primary underline">Editar linhas</Link>
+                <button className="text-destructive underline" onClick={async () => {
+                  if (!confirm(`Excluir "${a.nome}"? Todas as linhas e pontos deste arquivo serão apagados.`)) return;
+                  const { error } = await supabase.from("arquivos").delete().eq("id", a.id);
+                  if (error) alert(`Não foi possível excluir: ${error.message}`);
+                  qc.invalidateQueries({ queryKey: ["arquivos"] });
+                }}>Excluir</button>
+              </div>
             </div>
           ))}
         </div>
