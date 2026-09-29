@@ -1,0 +1,208 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system — Consulta de Itinerários
+ * Identidade de sinalização de transporte público: azul profundo institucional,
+ * âmbar de placa de ônibus, tipografia condensada para números de linha.
+ */
+
+@theme inline {
+  --font-display: "Bebas Neue", "Barlow Condensed", system-ui, sans-serif;
+  --font-sans: "Barlow", system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --shadow-card: 0 1px 2px oklch(0.25 0.06 250 / 0.06), 0 8px 24px oklch(0.25 0.06 250 / 0.08);
+  --shadow-raised: 0 12px 32px oklch(0.25 0.06 250 / 0.16);
+}
+
+:root {
+  --radius: 0.875rem;
+
+  --background: oklch(0.985 0.005 250);
+  --foreground: oklch(0.22 0.04 255);
+
+  --surface: oklch(1 0 0);
+  --surface-foreground: oklch(0.22 0.04 255);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.04 255);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.04 255);
+
+  --primary: oklch(0.42 0.13 252);
+  --primary-foreground: oklch(0.99 0.005 250);
+
+  --secondary: oklch(0.95 0.015 250);
+  --secondary-foreground: oklch(0.32 0.07 253);
+
+  --muted: oklch(0.955 0.01 250);
+  --muted-foreground: oklch(0.52 0.03 253);
+
+  --accent: oklch(0.79 0.16 76);
+  --accent-foreground: oklch(0.24 0.06 60);
+
+  --success: oklch(0.6 0.13 155);
+  --success-foreground: oklch(0.99 0.005 250);
+
+  --destructive: oklch(0.56 0.21 25);
+  --destructive-foreground: oklch(0.99 0.005 250);
+
+  --border: oklch(0.9 0.012 250);
+  --input: oklch(0.9 0.012 250);
+  --ring: oklch(0.42 0.13 252);
+
+  --chart-1: oklch(0.42 0.13 252);
+  --chart-2: oklch(0.79 0.16 76);
+  --chart-3: oklch(0.6 0.13 155);
+  --chart-4: oklch(0.56 0.21 25);
+  --chart-5: oklch(0.52 0.03 253);
+
+  --sidebar: oklch(0.99 0.005 250);
+  --sidebar-foreground: oklch(0.22 0.04 255);
+  --sidebar-primary: oklch(0.42 0.13 252);
+  --sidebar-primary-foreground: oklch(0.99 0.005 250);
+  --sidebar-accent: oklch(0.95 0.015 250);
+  --sidebar-accent-foreground: oklch(0.32 0.07 253);
+  --sidebar-border: oklch(0.9 0.012 250);
+  --sidebar-ring: oklch(0.42 0.13 252);
+}
+
+.dark {
+  --background: oklch(0.18 0.035 256);
+  --foreground: oklch(0.97 0.005 250);
+  --surface: oklch(0.23 0.04 256);
+  --surface-foreground: oklch(0.97 0.005 250);
+  --card: oklch(0.23 0.04 256);
+  --card-foreground: oklch(0.97 0.005 250);
+  --popover: oklch(0.23 0.04 256);
+  --popover-foreground: oklch(0.97 0.005 250);
+  --primary: oklch(0.72 0.12 245);
+  --primary-foreground: oklch(0.18 0.035 256);
+  --secondary: oklch(0.28 0.04 256);
+  --secondary-foreground: oklch(0.97 0.005 250);
+  --muted: oklch(0.28 0.04 256);
+  --muted-foreground: oklch(0.72 0.02 252);
+  --accent: oklch(0.8 0.15 76);
+  --accent-foreground: oklch(0.2 0.05 60);
+  --success: oklch(0.68 0.13 155);
+  --success-foreground: oklch(0.18 0.035 256);
+  --destructive: oklch(0.65 0.19 25);
+  --destructive-foreground: oklch(0.99 0.005 250);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.72 0.12 245);
+  --sidebar: oklch(0.23 0.04 256);
+  --sidebar-foreground: oklch(0.97 0.005 250);
+  --sidebar-primary: oklch(0.72 0.12 245);
+  --sidebar-primary-foreground: oklch(0.18 0.035 256);
+  --sidebar-accent: oklch(0.28 0.04 256);
+  --sidebar-accent-foreground: oklch(0.97 0.005 250);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.72 0.12 245);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: 0.01em;
+  }
+}
+
+/* Selo do número da linha (tipografia de sinalização) */
+@utility selo-linha {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.25rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-md);
+  background-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+@utility selo-linha-accent {
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+}
+
+@utility superficie {
+  background-color: var(--color-surface);
+  color: var(--color-surface-foreground);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+}
+
+/* Mapa */
+.leaflet-container {
+  font-family: var(--font-sans);
+  background-color: var(--color-muted);
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius-md);
+}
