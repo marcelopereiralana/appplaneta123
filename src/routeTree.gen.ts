@@ -17,6 +17,8 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as BairroSlugRouteImport } from './routes/bairro.$slug'
 import { Route as LinhaIdRouteImport } from './routes/linha.$id'
 import { Route as PontoIdRouteImport } from './routes/ponto.$id'
+import { Route as AuthenticatedEditarArquivoIdRouteImport } from './routes/_authenticated/editar.arquivo.$id'
+import { Route as AuthenticatedEditarRotaIdRouteImport } from './routes/_authenticated/editar.rota.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +59,18 @@ const PontoIdRoute = PontoIdRouteImport.update({
   path: '/ponto/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedEditarArquivoIdRoute =
+  AuthenticatedEditarArquivoIdRouteImport.update({
+    id: '/editar/arquivo/$id',
+    path: '/editar/arquivo/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEditarRotaIdRoute =
+  AuthenticatedEditarRotaIdRouteImport.update({
+    id: '/editar/rota/$id',
+    path: '/editar/rota/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +80,8 @@ export interface FileRoutesByFullPath {
   '/bairro/$slug': typeof BairroSlugRoute
   '/linha/$id': typeof LinhaIdRoute
   '/ponto/$id': typeof PontoIdRoute
+  '/editar/arquivo/$id': typeof AuthenticatedEditarArquivoIdRoute
+  '/editar/rota/$id': typeof AuthenticatedEditarRotaIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +91,8 @@ export interface FileRoutesByTo {
   '/bairro/$slug': typeof BairroSlugRoute
   '/linha/$id': typeof LinhaIdRoute
   '/ponto/$id': typeof PontoIdRoute
+  '/editar/arquivo/$id': typeof AuthenticatedEditarArquivoIdRoute
+  '/editar/rota/$id': typeof AuthenticatedEditarRotaIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +104,8 @@ export interface FileRoutesById {
   '/bairro/$slug': typeof BairroSlugRoute
   '/linha/$id': typeof LinhaIdRoute
   '/ponto/$id': typeof PontoIdRoute
+  '/_authenticated/editar/arquivo/$id': typeof AuthenticatedEditarArquivoIdRoute
+  '/_authenticated/editar/rota/$id': typeof AuthenticatedEditarRotaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +117,8 @@ export interface FileRouteTypes {
     | '/bairro/$slug'
     | '/linha/$id'
     | '/ponto/$id'
+    | '/editar/arquivo/$id'
+    | '/editar/rota/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +128,8 @@ export interface FileRouteTypes {
     | '/bairro/$slug'
     | '/linha/$id'
     | '/ponto/$id'
+    | '/editar/arquivo/$id'
+    | '/editar/rota/$id'
   id:
     | '__root__'
     | '/'
@@ -116,6 +140,8 @@ export interface FileRouteTypes {
     | '/bairro/$slug'
     | '/linha/$id'
     | '/ponto/$id'
+    | '/_authenticated/editar/arquivo/$id'
+    | '/_authenticated/editar/rota/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -186,15 +212,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PontoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/editar/arquivo/$id': {
+      id: '/_authenticated/editar/arquivo/$id'
+      path: '/editar/arquivo/$id'
+      fullPath: '/editar/arquivo/$id'
+      preLoaderRoute: typeof AuthenticatedEditarArquivoIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/editar/rota/$id': {
+      id: '/_authenticated/editar/rota/$id'
+      path: '/editar/rota/$id'
+      fullPath: '/editar/rota/$id'
+      preLoaderRoute: typeof AuthenticatedEditarRotaIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedEditarArquivoIdRoute: typeof AuthenticatedEditarArquivoIdRoute
+  AuthenticatedEditarRotaIdRoute: typeof AuthenticatedEditarRotaIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedEditarArquivoIdRoute: AuthenticatedEditarArquivoIdRoute,
+  AuthenticatedEditarRotaIdRoute: AuthenticatedEditarRotaIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
