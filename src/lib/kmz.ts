@@ -270,8 +270,9 @@ export function parseKml(xml: string): ResultadoParse {
     const pontos: PontoBruto[] = [];
     for (const pm of placemarks) {
       const conteudo = pm.conteudo;
-      if (!conteudo.includes("<Point>")) continue;
-      const pontoBloco = /<Point>[\s\S]*?<\/Point>/.exec(conteudo)?.[0] ?? conteudo;
+      // Placemark com Point e Polygon (ou outras geometrias): usa só o Point.
+      const pontoBloco = /<Point[\s>][\s\S]*?<\/Point>/.exec(conteudo)?.[0];
+      if (!pontoBloco) continue;
       const pares = lerCoordenadas(pontoBloco);
       const nomeOriginal = limpar(tag(conteudo, "name"));
       const descricaoOriginal = limpar(tag(conteudo, "description"));

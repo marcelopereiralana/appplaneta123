@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790705151177,
+      "tag": "0000_novo_esquema_arquivos_rotas_paradas",
+      "breakpoints": true
+    }
+  ]
 }
