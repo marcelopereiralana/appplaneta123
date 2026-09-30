@@ -57,7 +57,8 @@ export default function EditorRota({
         const label = `${p.ordem}. ${p.nome ?? "Ponto"}`;
         return (
           <Marker key={p.id} position={[p.lat, p.lon]} icon={getIconePonto(estado, label)} draggable
-            aria-label={label}
+            title={label}
+            alt={`${label} - ponto editável`}
             eventHandlers={{
               click: () => onSelecionar(p.id),
               dragend: (e) => { const ll = (e.target as L.Marker).getLatLng(); onMoverParada(p.id, ll.lat, ll.lng); },

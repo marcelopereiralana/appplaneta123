@@ -38,10 +38,8 @@ export default function Mapa({ trajeto, pontos }: { trajeto: [number, number][];
             return (
               <Marker
                 key={p.id + i}
-                center={[p.latitude, p.longitude]}
                 position={[p.latitude, p.longitude]}
                 icon={getIconePonto(estado, label)}
-                aria-label={label}
                 eventHandlers={{ click: () => setSelecionado(p.id) }}
               >
                 <Popup>{label}</Popup>
