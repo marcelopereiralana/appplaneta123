@@ -51,17 +51,37 @@ export const linhaQuery = (id: string) =>
   queryOptions({
     queryKey: ["linha", id],
     queryFn: async () => {
-      const [l, t, i] = await Promise.all([
-        supabase.from("linhas").select("*").eq("id", id).maybeSingle(),
-        supabase.from("trajetos").select("geometria, distancia_km").eq("linha_id", id).maybeSingle(),
+      const [r, p] = await Promise.all([
+        supabase.from("rotas").select("id, codigo, nome, origem, destino, sentido, trajeto_original, trajeto_editado").eq("id", id).maybeSingle(),
         supabase
-          .from("itinerarios")
-          .select("ordem, pontos(id, codigo, nome, bairro, rua, tipo, latitude, longitude)")
-          .eq("linha_id", id)
+          .from("paradas")
+          .select("id, ordem, nome, tipo, bairro, rua, lat_original, lon_original, lat_editada, lon_editada, suspeito")
+          .eq("rota_id", id)
           .order("ordem"),
       ]);
-      if (l.error) throw l.error;
-      return { linha: l.data, trajeto: t.data, pontos: i.data ?? [] };
+      if (r.error) throw r.error;
+      if (p.error) throw p.error;
+      const rota = r.data;
+      const linha = rota
+        ? { id: rota.id, numero: rota.codigo, nome: rota.nome, origem: rota.origem, destino: rota.destino, sentido_nome: rota.sentido }
+        : null;
+      const geometria = (rota?.trajeto_editado ?? rota?.trajeto_original ?? []) as [number, number][];
+      const trajeto = { geometria, distancia_km: null as number | null };
+      const pontos = (p.data ?? []).map((parada) => ({
+        ordem: parada.ordem,
+        pontos: {
+          id: parada.id,
+          codigo: null as string | null,
+          nome: parada.nome,
+          bairro: parada.bairro,
+          rua: parada.rua,
+          tipo: parada.tipo,
+          latitude: parada.lat_editada ?? parada.lat_original,
+          longitude: parada.lon_editada ?? parada.lon_original,
+          suspeito: parada.suspeito,
+        },
+      }));
+      return { linha, trajeto, pontos };
     },
   });
 
