@@ -4,22 +4,33 @@ import { supabase } from "@/integrations/supabase/client";
 export const ordenarNumero = (a: { numero: string }, b: { numero: string }) =>
   a.numero.localeCompare(b.numero, "pt-BR", { numeric: true });
 
+type Rota = { id: string; codigo: string; origem: string | null; destino: string | null; sentido: string };
+const paraLinha = (r: Rota) => ({ id: r.id, numero: r.codigo, origem: r.origem, destino: r.destino, sentido_nome: r.sentido });
+
 export const buscaQuery = (termo: string) =>
   queryOptions({
     queryKey: ["busca", termo],
     enabled: termo.trim().length >= 2,
     queryFn: async () => {
       const t = termo.trim();
-      const [linhas, porNumero, locais] = await Promise.all([
-        supabase.rpc("buscar_linhas_por_local", { termo: t }),
-        supabase.from("linhas").select("id, numero, origem, destino, sentido_nome").eq("numero", t.replace(/^0+/, "")),
-        supabase.from("localidades").select("id, nome, slug, tipo, bairro, total_pontos").ilike("busca", `%${t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "")}%`).limit(8),
+      const like = `%${t.replace(/[%,()]/g, " ")}%`;
+      const [porNumero, paradas] = await Promise.all([
+        supabase.from("rotas").select("id, codigo, origem, destino, sentido").eq("ativo", true).eq("codigo", t.replace(/^0+/, "")),
+        supabase.from("paradas").select("rota_id, rotas!inner(id, codigo, origem, destino, sentido, ativo)")
+          .eq("rotas.ativo", true).or(`bairro.ilike.${like},rua.ilike.${like},nome.ilike.${like}`).limit(2000),
       ]);
-      if (linhas.error) throw linhas.error;
+      if (paradas.error) throw paradas.error;
+      const mapa = new Map<string, { linha_id: string; numero: string; origem: string | null; destino: string | null; sentido: string; sentido_nome: string; total_pontos: number }>();
+      for (const p of paradas.data ?? []) {
+        const r = p.rotas as unknown as Rota;
+        const e = mapa.get(r.id);
+        if (e) e.total_pontos += 1;
+        else mapa.set(r.id, { linha_id: r.id, numero: r.codigo, origem: r.origem, destino: r.destino, sentido: r.sentido, sentido_nome: r.sentido, total_pontos: 1 });
+      }
       return {
-        linhas: [...(linhas.data ?? [])].sort(ordenarNumero),
-        exata: porNumero.data ?? [],
-        locais: locais.data ?? [],
+        linhas: [...mapa.values()].sort(ordenarNumero),
+        exata: (porNumero.data ?? []).map(paraLinha),
+        locais: [] as { id: string; nome: string; slug: string; tipo: string; bairro: string | null; total_pontos: number }[],
       };
     },
   });
@@ -28,11 +39,11 @@ export const todasLinhasQuery = queryOptions({
   queryKey: ["linhas"],
   queryFn: async () => {
     const { data, error } = await supabase
-      .from("linhas")
-      .select("id, numero, origem, destino, sentido_nome, itinerarios(count)")
+      .from("rotas")
+      .select("id, codigo, origem, destino, sentido, paradas(count)")
       .eq("ativo", true);
     if (error) throw error;
-    return [...data].sort(ordenarNumero);
+    return data.map((r) => ({ ...paraLinha(r), itinerarios: r.paradas })).sort(ordenarNumero);
   },
 });
 
