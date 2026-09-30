@@ -1,22 +1,9 @@
 import { useMemo, useState } from "react";
 import L from "leaflet";
 import { MapContainer, TileLayer, Polyline, Marker, Tooltip, useMapEvents } from "react-leaflet";
+import { getIconePonto, getIconeVertice } from "./mapaIcons";
 
 export type ParadaEd = { id: string; ordem: number; nome: string | null; lat: number; lon: number; suspeito: boolean; editado: boolean };
-
-const iconePonto = (n: number, suspeito: boolean, sel: boolean) =>
-  L.divIcon({
-    className: "",
-    iconSize: [22, 22],
-    iconAnchor: [11, 11],
-    html: `<div style="width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:600 10px sans-serif;border:2px solid ${sel ? "#000" : "#1e4a8c"};background:${suspeito ? "#d93025" : "#fff"};color:${suspeito ? "#fff" : "#1e4a8c"}">${n}</div>`,
-  });
-const iconeVertice = L.divIcon({
-  className: "",
-  iconSize: [10, 10],
-  iconAnchor: [5, 5],
-  html: `<div style="width:10px;height:10px;background:#f0a92a;border:1px solid #1e4a8c"></div>`,
-});
 
 function Vertices({ trajeto, onMover }: { trajeto: [number, number][]; onMover: (i: number, lon: number, lat: number) => void }) {
   const [view, setView] = useState<{ b: L.LatLngBounds; z: number } | null>(null);
@@ -30,7 +17,7 @@ function Vertices({ trajeto, onMover }: { trajeto: [number, number][]; onMover: 
   return (
     <>
       {visiveis.map(([[lon, lat], i]) => (
-        <Marker key={`${i}-${lon}-${lat}`} position={[lat, lon]} icon={iconeVertice} draggable
+        <Marker key={`${i}-${lon}-${lat}`} position={[lat, lon]} icon={getIconeVertice()} draggable
           eventHandlers={{ dragend: (e) => { const p = (e.target as L.Marker).getLatLng(); onMover(i, p.lng, p.lat); } }} />
       ))}
     </>
@@ -57,15 +44,28 @@ export default function EditorRota({
       <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       {trajeto.length > 1 && <Polyline positions={trajeto.map(([lon, lat]) => [lat, lon] as [number, number])} pathOptions={{ color: "#1e4a8c", weight: 4 }} />}
       <Vertices trajeto={trajeto} onMover={onMoverVertice} />
-      {paradas.map((p) => (
-        <Marker key={p.id} position={[p.lat, p.lon]} icon={iconePonto(p.ordem, p.suspeito, p.id === selecionada)} draggable
-          eventHandlers={{
-            click: () => onSelecionar(p.id),
-            dragend: (e) => { const ll = (e.target as L.Marker).getLatLng(); onMoverParada(p.id, ll.lat, ll.lng); },
-          }}>
-          <Tooltip>{p.ordem}. {p.nome ?? "Ponto"}</Tooltip>
-        </Marker>
-      ))}
+      {paradas.map((p, i) => {
+        const estado = p.id === selecionada
+          ? "selecionado"
+          : p.suspeito
+            ? "suspeito"
+            : i === 0
+              ? "origem"
+              : i === paradas.length - 1
+                ? "destino"
+                : "normal";
+        const label = `${p.ordem}. ${p.nome ?? "Ponto"}`;
+        return (
+          <Marker key={p.id} position={[p.lat, p.lon]} icon={getIconePonto(estado, label)} draggable
+            aria-label={label}
+            eventHandlers={{
+              click: () => onSelecionar(p.id),
+              dragend: (e) => { const ll = (e.target as L.Marker).getLatLng(); onMoverParada(p.id, ll.lat, ll.lng); },
+            }}>
+            <Tooltip>{label}</Tooltip>
+          </Marker>
+        );
+      })}
     </MapContainer>
   );
 }
