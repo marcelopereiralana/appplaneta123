@@ -6,6 +6,7 @@ import { Pagina } from "@/components/Layout";
 import { lerArquivo } from "@/lib/publicar";
 import { importar, prepararImportacao, type Resumo } from "@/lib/importar";
 import type { ResultadoParse } from "@/lib/kmz";
+import { GerenciarAvisos } from "@/components/GerenciarAvisos";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -102,6 +103,8 @@ function Admin() {
         {estado && estado !== "gravando" && <p className="text-sm">{estado}</p>}
         {final && <CaixaResumo r={final} />}
       </section>
+
+      <GerenciarAvisos />
 
       <section className="mt-6">
         <h2 className="font-display text-3xl">Arquivos importados</h2>
