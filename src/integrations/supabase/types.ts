@@ -54,7 +54,6 @@ export type Database = {
           mensagem: string
           tipo: string
           codigo_linha: string | null
-          rota_id: string | null
           inicio_em: string
           fim_em: string
           ativo: boolean
@@ -68,7 +67,6 @@ export type Database = {
           mensagem: string
           tipo?: string
           codigo_linha?: string | null
-          rota_id?: string | null
           inicio_em?: string
           fim_em: string
           ativo?: boolean
@@ -82,7 +80,6 @@ export type Database = {
           mensagem?: string
           tipo?: string
           codigo_linha?: string | null
-          rota_id?: string | null
           inicio_em?: string
           fim_em?: string
           ativo?: boolean
@@ -90,15 +87,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "avisos_linha_rota_id_fkey"
-            columns: ["rota_id"]
-            isOneToOne: false
-            referencedRelation: "rotas"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       auditoria: {
         Row: {
