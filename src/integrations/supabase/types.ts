@@ -47,6 +47,59 @@ export type Database = {
         }
         Relationships: []
       }
+      avisos_linha: {
+        Row: {
+          id: string
+          titulo: string
+          mensagem: string
+          tipo: string
+          codigo_linha: string | null
+          rota_id: string | null
+          inicio_em: string
+          fim_em: string
+          ativo: boolean
+          criado_por: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          titulo: string
+          mensagem: string
+          tipo?: string
+          codigo_linha?: string | null
+          rota_id?: string | null
+          inicio_em?: string
+          fim_em: string
+          ativo?: boolean
+          criado_por?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          titulo?: string
+          mensagem?: string
+          tipo?: string
+          codigo_linha?: string | null
+          rota_id?: string | null
+          inicio_em?: string
+          fim_em?: string
+          ativo?: boolean
+          criado_por?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avisos_linha_rota_id_fkey"
+            columns: ["rota_id"]
+            isOneToOne: false
+            referencedRelation: "rotas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       auditoria: {
         Row: {
           created_at: string
