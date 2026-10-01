@@ -126,7 +126,6 @@ export type AvisoLinha = {
   mensagem: string;
   tipo: "informativo" | "desvio" | "atencao";
   codigo_linha: string | null;
-  rota_id: string | null;
   inicio_em: string;
   fim_em: string;
   ativo: boolean;
@@ -138,7 +137,7 @@ export const avisosAtivosQuery = (rotaId?: string, codigo?: string) =>
     queryFn: async () => {
       const { data, error } = await supabase
         .from("avisos_linha")
-        .select("id, titulo, mensagem, tipo, codigo_linha, rota_id, inicio_em, fim_em, ativo")
+        .select("id, titulo, mensagem, tipo, codigo_linha, inicio_em, fim_em, ativo")
         .eq("ativo", true)
         .lte("inicio_em", new Date().toISOString())
         .gte("fim_em", new Date().toISOString())
@@ -147,9 +146,9 @@ export const avisosAtivosQuery = (rotaId?: string, codigo?: string) =>
       if (rotaId === undefined && codigo === undefined) return (data ?? []) as AvisoLinha[];
       const base = codigo?.split("_")[0] ?? null;
       return (data ?? []).filter((aviso) =>
-        (aviso.rota_id === null && aviso.codigo_linha === null) ||
-        (base !== null && aviso.rota_id === null && aviso.codigo_linha === base) ||
-        (rotaId !== undefined && aviso.rota_id === rotaId)
+        aviso.codigo_linha === null ||
+        (codigo !== undefined && aviso.codigo_linha === codigo) ||
+        (base !== null && aviso.codigo_linha === base)
       ) as AvisoLinha[];
     },
   });
@@ -159,7 +158,7 @@ export const todosAvisosQuery = queryOptions({
   queryFn: async () => {
     const { data, error } = await supabase
       .from("avisos_linha")
-      .select("id, titulo, mensagem, tipo, codigo_linha, rota_id, inicio_em, fim_em, ativo")
+      .select("id, titulo, mensagem, tipo, codigo_linha, inicio_em, fim_em, ativo")
       .order("created_at", { ascending: false });
     if (error) throw error;
     return (data ?? []) as AvisoLinha[];
