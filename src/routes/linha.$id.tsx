@@ -4,7 +4,8 @@ import { ClientOnly } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 import { Share2 } from "lucide-react";
 import { Pagina } from "@/components/Layout";
-import { linhaQuery } from "@/lib/dados";
+import { avisosAtivosQuery, linhaQuery } from "@/lib/dados";
+import { AvisosLinha } from "@/components/AvisosLinha";
 
 const Mapa = lazy(() => import("@/components/Mapa"));
 
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/linha/$id")({
 function PaginaLinha() {
   const { id } = Route.useParams();
   const { data, isLoading } = useQuery(linhaQuery(id));
+  const { data: avisos = [] } = useQuery(avisosAtivosQuery(id, data?.linha?.numero));
   if (isLoading) return <Pagina><p>Carregando…</p></Pagina>;
   if (!data?.linha) return <Pagina><p>Linha não encontrada.</p></Pagina>;
   const { linha, trajeto, pontos } = data;
@@ -46,6 +48,7 @@ function PaginaLinha() {
         </div>
         <button onClick={compartilhar} aria-label="Compartilhar" className="rounded-md border border-input p-2"><Share2 className="h-5 w-5" /></button>
       </div>
+      <AvisosLinha avisos={avisos} />
       <div className="mt-4 h-[55vh] overflow-hidden rounded-xl border">
         <ClientOnly fallback={<div className="h-full animate-pulse bg-muted" />}>
           <Suspense fallback={<div className="h-full animate-pulse bg-muted" />}>
