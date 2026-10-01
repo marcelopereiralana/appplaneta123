@@ -89,11 +89,33 @@ export const pontoQuery = (id: string) =>
   queryOptions({
     queryKey: ["ponto", id],
     queryFn: async () => {
-      const [p, l] = await Promise.all([
+      const [parada, ponto, linhasRpc] = await Promise.all([
+        supabase.from("paradas")
+          .select("id, nome, tipo, bairro, rua, lat_original, lon_original, lat_editada, lon_editada, suspeito, rotas!inner(id, codigo, origem, destino, sentido, ativo)")
+          .eq("id", id)
+          .maybeSingle(),
         supabase.from("pontos").select("*").eq("id", id).maybeSingle(),
         supabase.rpc("linhas_do_ponto", { _ponto_id: id }),
       ]);
-      if (p.error) throw p.error;
-      return { ponto: p.data, linhas: [...(l.data ?? [])].sort(ordenarNumero) };
+      if (parada.error) throw parada.error;
+      if (ponto.error) throw ponto.error;
+
+      if (parada.data) {
+        const rota = parada.data.rotas as unknown as { id: string; codigo: string; origem: string | null; destino: string | null; sentido: string; ativo: boolean };
+        const ponto = {
+          id: parada.data.id,
+          nome: parada.data.nome,
+          tipo: parada.data.tipo,
+          bairro: parada.data.bairro,
+          rua: parada.data.rua,
+          codigo: null as string | null,
+          latitude: parada.data.lat_editada ?? parada.data.lat_original,
+          longitude: parada.data.lon_editada ?? parada.data.lon_original,
+        };
+        const linhas = rota?.ativo ? [paraLinha(rota)] : [];
+        return { ponto, linhas: linhas.sort(ordenarNumero) };
+      }
+
+      return { ponto: ponto.data, linhas: [...(linhasRpc.data ?? [])].sort(ordenarNumero) };
     },
   });
