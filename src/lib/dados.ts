@@ -144,9 +144,10 @@ export const avisosAtivosQuery = (rotaId?: string, codigo?: string) =>
         .gte("fim_em", new Date().toISOString())
         .order("inicio_em", { ascending: false });
       if (error) throw error;
+      if (rotaId === undefined && codigo === undefined) return (data ?? []) as AvisoLinha[];
       const base = codigo?.split("_")[0] ?? null;
       return (data ?? []).filter((aviso) =>
-        aviso.rota_id === null && aviso.codigo_linha === null ||
+        (aviso.rota_id === null && aviso.codigo_linha === null) ||
         (base !== null && aviso.rota_id === null && aviso.codigo_linha === base) ||
         (rotaId !== undefined && aviso.rota_id === rotaId)
       ) as AvisoLinha[];
