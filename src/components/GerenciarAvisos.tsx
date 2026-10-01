@@ -11,7 +11,7 @@ type Form = {
   tipo: AvisoLinha["tipo"];
   alvo: Alvo;
   codigo_linha: string;
-  rota_id: string;
+  codigo_itinerario: string;
   inicio_em: string;
   fim_em: string;
   ativo: boolean;
@@ -25,7 +25,7 @@ const localInput = (d: Date) => {
 const novoForm = (): Form => {
   const agora = new Date();
   const fim = new Date(agora.getTime() + 24 * 60 * 60 * 1000);
-  return { titulo: "", mensagem: "", tipo: "informativo", alvo: "todas", codigo_linha: "", rota_id: "", inicio_em: localInput(agora), fim_em: localInput(fim), ativo: true };
+  return { titulo: "", mensagem: "", tipo: "informativo", alvo: "todas", codigo_linha: "", codigo_itinerario: "", inicio_em: localInput(agora), fim_em: localInput(fim), ativo: true };
 };
 
 export function GerenciarAvisos() {
@@ -51,32 +51,31 @@ export function GerenciarAvisos() {
   const limpar = () => { setEditando(null); setForm(novoForm()); setEstado(null); };
 
   const editar = (a: AvisoLinha) => {
-    const rota = a.rota_id ? (rotas.data ?? []).find((r) => r.id === a.rota_id) : null;
-    setEditando(a.id);
+        setEditando(a.id);
     setForm({
       titulo: a.titulo,
       mensagem: a.mensagem,
       tipo: a.tipo,
-      alvo: a.rota_id ? "itinerario" : a.codigo_linha ? "linha" : "todas",
-      codigo_linha: a.codigo_linha ?? "",
-      rota_id: a.rota_id ?? "",
+      alvo: a.codigo_linha ? (a.codigo_linha.includes("_") ? "itinerario" : "linha") : "todas",
+      codigo_linha: a.codigo_linha && !a.codigo_linha.includes("_") ? a.codigo_linha : "",
+      codigo_itinerario: a.codigo_linha?.includes("_") ? a.codigo_linha : "",
       inicio_em: localInput(new Date(a.inicio_em)),
       fim_em: localInput(new Date(a.fim_em)),
       ativo: a.ativo,
     });
-    if (rota) setForm((old) => ({ ...old, rota_id: rota.id }));
     window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
   };
 
   const salvar = async () => {
     if (!form.titulo.trim() || !form.mensagem.trim()) return setEstado("Preencha título e mensagem.");
+    if (form.alvo === "linha" && !form.codigo_linha) return setEstado("Selecione a linha.");
+    if (form.alvo === "itinerario" && !form.codigo_itinerario) return setEstado("Selecione o itinerário.");
     if (!form.fim_em || new Date(form.fim_em) <= new Date(form.inicio_em)) return setEstado("A data final deve ser posterior à inicial.");
     const payload = {
       titulo: form.titulo.trim(),
       mensagem: form.mensagem.trim(),
       tipo: form.tipo,
-      codigo_linha: form.alvo === "linha" ? form.codigo_linha : null,
-      rota_id: form.alvo === "itinerario" ? form.rota_id : null,
+      codigo_linha: form.alvo === "linha" ? form.codigo_linha : form.alvo === "itinerario" ? form.codigo_itinerario : null,
       inicio_em: new Date(form.inicio_em).toISOString(),
       fim_em: new Date(form.fim_em).toISOString(),
       ativo: form.ativo,
@@ -125,7 +124,7 @@ export function GerenciarAvisos() {
             </select>
           </label>
           <label className="text-sm">Aplicar a
-            <select value={form.alvo} onChange={(e) => setForm({ ...form, alvo: e.target.value as Alvo, codigo_linha: "", rota_id: "" })} className="mt-1 h-11 w-full rounded-md border bg-card px-3">
+            <select value={form.alvo} onChange={(e) => setForm({ ...form, alvo: e.target.value as Alvo, codigo_linha: "", codigo_itinerario: "" })} className="mt-1 h-11 w-full rounded-md border bg-card px-3">
               <option value="todas">Todas as linhas</option><option value="linha">Número da linha</option><option value="itinerario">Itinerário específico</option>
             </select>
           </label>
@@ -139,9 +138,9 @@ export function GerenciarAvisos() {
         )}
         {form.alvo === "itinerario" && (
           <label className="block text-sm">Itinerário
-            <select value={form.rota_id} onChange={(e) => setForm({ ...form, rota_id: e.target.value })} className="mt-1 h-11 w-full rounded-md border bg-card px-3">
+            <select value={form.codigo_itinerario} onChange={(e) => setForm({ ...form, codigo_itinerario: e.target.value })} className="mt-1 h-11 w-full rounded-md border bg-card px-3">
               <option value="">Selecione</option>
-              {(rotas.data ?? []).map((r) => <option key={r.id} value={r.id}>{r.codigo} — {r.origem ?? "?"} → {r.destino ?? "?"}</option>)}
+              {(rotas.data ?? []).map((r) => <option key={r.id} value={r.codigo}>{r.codigo} — {r.origem ?? "?"} → {r.destino ?? "?"}</option>)}
             </select>
           </label>
         )}
@@ -171,7 +170,7 @@ export function GerenciarAvisos() {
               <div>
                 <strong>{a.titulo}</strong>
                 <p className="text-xs text-muted-foreground">
-                  {a.rota_id ? (rotas.data ?? []).find((r) => r.id === a.rota_id)?.codigo ?? "Itinerário" : a.codigo_linha ? `Linha ${a.codigo_linha}` : "Todas as linhas"}
+                  {a.codigo_linha ? (a.codigo_linha.includes("_") ? `Itinerário ${a.codigo_linha}` : `Linha ${a.codigo_linha}`) : "Todas as linhas"}
                   {" · "}{a.tipo}{" · "}{a.ativo ? "ativo" : "inativo"}
                 </p>
               </div>
