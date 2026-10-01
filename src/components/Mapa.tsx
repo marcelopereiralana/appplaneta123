@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MapContainer, TileLayer, Polyline, Marker, Popup, Circle, CircleMarker, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
-import { LocateFixed } from "lucide-react";
+import { LocateFixed, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
@@ -14,6 +14,20 @@ type LocalizacaoUsuario = {
   longitude: number;
   accuracy: number;
 };
+
+function distanciaMetros(a: LocalizacaoUsuario, b: PontoMapa) {
+  const R = 6371000;
+  const lat1 = (a.latitude * Math.PI) / 180;
+  const lat2 = (b.latitude * Math.PI) / 180;
+  const dLat = ((b.latitude - a.latitude) * Math.PI) / 180;
+  const dLon = ((b.longitude - a.longitude) * Math.PI) / 180;
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+}
+
+function formatarDistancia(metros: number) {
+  return metros < 1000 ? `${Math.round(metros)} m` : `${(metros / 1000).toFixed(1).replace(".", ",")} km`;
+}
 
 function ControleLocalizacao({
   localizacao,
@@ -113,6 +127,54 @@ function ControleLocalizacao({
   );
 }
 
+function ParadasProximas({
+  localizacao,
+  pontos,
+}: {
+  localizacao: LocalizacaoUsuario | null;
+  pontos: PontoMapa[];
+}) {
+  const map = useMap();
+
+  const proximas = useMemo(() => {
+    if (!localizacao) return [];
+    return pontos
+      .map((ponto) => ({ ponto, distancia: distanciaMetros(localizacao, ponto) }))
+      .sort((a, b) => a.distancia - b.distancia)
+      .slice(0, 5);
+  }, [localizacao, pontos]);
+
+  if (!localizacao || !proximas.length) return null;
+
+  return (
+    <div className="leaflet-bottom leaflet-left" style={{ zIndex: 1000 }}>
+      <div className="leaflet-control mb-2 ml-2 w-[min(320px,calc(100vw-32px))] rounded-lg border bg-background/95 p-3 shadow-lg backdrop-blur">
+        <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
+          <Navigation className="h-4 w-4" />
+          Pontos mais próximos
+        </div>
+        <div className="space-y-1">
+          {proximas.map(({ ponto, distancia }) => (
+            <button
+              key={ponto.id}
+              type="button"
+              className="flex w-full items-center justify-between gap-3 rounded-md px-2 py-2 text-left text-sm hover:bg-muted"
+              onClick={() => {
+                map.flyTo([ponto.latitude, ponto.longitude], Math.max(map.getZoom(), 17), { duration: 0.6 });
+              }}
+            >
+              <span className="min-w-0 truncate">
+                {ponto.ordem ? `${ponto.ordem}. ` : ""}{ponto.nome ?? "Ponto"}
+              </span>
+              <span className="shrink-0 text-xs text-muted-foreground">{formatarDistancia(distancia)}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Mapa({ trajeto, pontos }: { trajeto: [number, number][]; pontos: PontoMapa[] }) {
   const [selecionado, setSelecionado] = useState<string | null>(null);
   const [localizacao, setLocalizacao] = useState<LocalizacaoUsuario | null>(null);
@@ -128,6 +190,7 @@ export default function Mapa({ trajeto, pontos }: { trajeto: [number, number][];
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <ControleLocalizacao localizacao={localizacao} setLocalizacao={setLocalizacao} />
+      <ParadasProximas localizacao={localizacao} pontos={pontos} />
       {linha.length > 1 && <Polyline positions={linha} pathOptions={{ color: "#1e4a8c", weight: 5 }} />}
       {usarCluster ? (
         <MarkerClusterGroup
