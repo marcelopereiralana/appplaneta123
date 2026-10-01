@@ -83,6 +83,37 @@ function atributoId(abertura: string | undefined): string | null {
   return m?.[1] ?? null;
 }
 
+function textoPonto(p: PontoBruto): string {
+  return [p.nome, p.bairro, p.rua, p.endereco, p.original_name, p.original_description]
+    .filter(Boolean)
+    .join(" ")
+    .normalize("NFD")
+    .replace(/[\\u0300-\\u036f]/g, "")
+    .toLowerCase();
+}
+
+function ehArcelorMittal(p: PontoBruto | undefined): boolean {
+  if (!p) return false;
+  const texto = textoPonto(p);
+  return texto.includes("arcelormittal") || texto.includes("rodoviaria arcelor");
+}
+
+function ordenarPontosPorSentido(pontos: PontoBruto[], sentido: string): PontoBruto[] {
+  if (pontos.length < 2) return pontos;
+  const ida = sentido.toUpperCase().endsWith("I");
+  const volta = sentido.toUpperCase().endsWith("V");
+  const primeiroArcelor = ehArcelorMittal(pontos[0]);
+  const ultimoArcelor = ehArcelorMittal(pontos[pontos.length - 1]);
+
+  // Ida: bairro -> Rodoviária ArcelorMittal.
+  if (ida && primeiroArcelor && !ultimoArcelor) return [...pontos].reverse();
+
+  // Volta: Rodoviária ArcelorMittal -> bairro.
+  if (volta && ultimoArcelor && !primeiroArcelor) return [...pontos].reverse();
+
+  return pontos;
+}
+
 function limpar(s: string | null | undefined): string | null {
   if (!s) return null;
   const v = s.replace(/\s+/g, " ").trim();
@@ -323,9 +354,10 @@ export function parseKml(xml: string): ResultadoParse {
       });
     }
 
+    const pontosOrdenados = ordenarPontosPorSentido(pontos, sentido);
     const rotulo = (p: PontoBruto | undefined) => (p ? (p.bairro ?? p.nome ?? null) : null);
-    const origem = rotulo(pontos[0]);
-    const destino = rotulo(pontos[pontos.length - 1]);
+    const origem = rotulo(pontosOrdenados[0]);
+    const destino = rotulo(pontosOrdenados[pontosOrdenados.length - 1]);
 
     linhas.push({
       identificador,
@@ -340,7 +372,7 @@ export function parseKml(xml: string): ResultadoParse {
         ? limpar(tag(placemarkTrajeto.conteudo, "description"))
         : null,
       trajeto,
-      pontos,
+      pontos: pontosOrdenados,
     });
   }
 
