@@ -34,9 +34,9 @@ function Linhas() {
           const n = (l.itinerarios as unknown as { count: number }[])[0]?.count ?? 0;
           const base = l.numero.split("_")[0];
           const temAviso = avisos.some((a) =>
-            (a.rota_id === null && a.codigo_linha === null) ||
-            (a.rota_id === null && a.codigo_linha === base) ||
-            a.rota_id === l.id
+            a.codigo_linha === null ||
+            a.codigo_linha === l.numero ||
+            a.codigo_linha === base
           );
           return <CartaoLinha key={l.id} id={l.id} numero={l.numero} origem={l.origem} destino={l.destino}
             extra={`${n} pontos${temAviso ? " · Aviso ativo" : ""}`} />;
