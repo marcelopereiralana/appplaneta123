@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Pagina, CartaoLinha } from "@/components/Layout";
-import { todasLinhasQuery } from "@/lib/dados";
+import { avisosAtivosQuery, todasLinhasQuery } from "@/lib/dados";
 
 export const Route = createFileRoute("/linhas")({
   head: () => ({
@@ -20,6 +20,7 @@ const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").t
 
 function Linhas() {
   const { data, isLoading } = useQuery(todasLinhasQuery);
+  const { data: avisos = [] } = useQuery(avisosAtivosQuery());
   const [f, setF] = useState("");
   const lista = (data ?? []).filter((l) => !f || norm(`${l.numero} ${l.origem} ${l.destino}`).includes(norm(f)));
   return (
@@ -31,7 +32,14 @@ function Linhas() {
       <div className="mt-3 grid gap-2">
         {lista.map((l) => {
           const n = (l.itinerarios as unknown as { count: number }[])[0]?.count ?? 0;
-          return <CartaoLinha key={l.id} id={l.id} numero={l.numero} origem={l.origem} destino={l.destino} extra={`${n} pontos`} />;
+          const base = l.numero.split("_")[0];
+          const temAviso = avisos.some((a) =>
+            a.codigo_linha === null ||
+            a.codigo_linha === l.numero ||
+            a.codigo_linha === base
+          );
+          return <CartaoLinha key={l.id} id={l.id} numero={l.numero} origem={l.origem} destino={l.destino}
+            extra={`${n} pontos${temAviso ? " · Aviso ativo" : ""}`} />;
         })}
       </div>
     </Pagina>

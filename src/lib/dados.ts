@@ -119,3 +119,48 @@ export const pontoQuery = (id: string) =>
       return { ponto: ponto.data, linhas: [...(linhasRpc.data ?? [])].sort(ordenarNumero) };
     },
   });
+
+export type AvisoLinha = {
+  id: string;
+  titulo: string;
+  mensagem: string;
+  tipo: "informativo" | "desvio" | "atencao";
+  codigo_linha: string | null;
+  inicio_em: string;
+  fim_em: string;
+  ativo: boolean;
+};
+
+export const avisosAtivosQuery = (rotaId?: string, codigo?: string) =>
+  queryOptions({
+    queryKey: ["avisos-ativos", rotaId ?? "todas", codigo ?? ""],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("avisos_linha")
+        .select("id, titulo, mensagem, tipo, codigo_linha, inicio_em, fim_em, ativo")
+        .eq("ativo", true)
+        .lte("inicio_em", new Date().toISOString())
+        .gte("fim_em", new Date().toISOString())
+        .order("inicio_em", { ascending: false });
+      if (error) throw error;
+      if (rotaId === undefined && codigo === undefined) return (data ?? []) as AvisoLinha[];
+      const base = codigo?.split("_")[0] ?? null;
+      return (data ?? []).filter((aviso) =>
+        aviso.codigo_linha === null ||
+        (codigo !== undefined && aviso.codigo_linha === codigo) ||
+        (base !== null && aviso.codigo_linha === base)
+      ) as AvisoLinha[];
+    },
+  });
+
+export const todosAvisosQuery = queryOptions({
+  queryKey: ["avisos-admin"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("avisos_linha")
+      .select("id, titulo, mensagem, tipo, codigo_linha, inicio_em, fim_em, ativo")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as AvisoLinha[];
+  },
+});

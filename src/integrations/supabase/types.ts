@@ -47,6 +47,48 @@ export type Database = {
         }
         Relationships: []
       }
+      avisos_linha: {
+        Row: {
+          id: string
+          titulo: string
+          mensagem: string
+          tipo: string
+          codigo_linha: string | null
+          inicio_em: string
+          fim_em: string
+          ativo: boolean
+          criado_por: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          titulo: string
+          mensagem: string
+          tipo?: string
+          codigo_linha?: string | null
+          inicio_em?: string
+          fim_em: string
+          ativo?: boolean
+          criado_por?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          titulo?: string
+          mensagem?: string
+          tipo?: string
+          codigo_linha?: string | null
+          inicio_em?: string
+          fim_em?: string
+          ativo?: boolean
+          criado_por?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       auditoria: {
         Row: {
           created_at: string
